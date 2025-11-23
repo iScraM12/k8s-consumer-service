@@ -1,7 +1,7 @@
 package com.iscram.k8s.consumer.boundary.rest;
 
 import com.iscram.k8s.consumer.control.CarService;
-import com.iscram.k8s.consumer.provider.api.model.Car; // Importiert das generierte Car-Modell
+import com.iscram.k8s.consumer.provider.api.model.Car;
 import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateInstance;
 import io.smallrye.common.annotation.Blocking;
@@ -10,9 +10,12 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
+import lombok.extern.slf4j.Slf4j;
 
 import java.net.URI;
 import java.util.List;
+
+@Slf4j
 @Path("/cars-ui")
 @Produces(MediaType.TEXT_HTML)
 @Blocking
@@ -26,6 +29,7 @@ public class CarTemplateResource {
 
     @GET
     public TemplateInstance getCarsPage(@QueryParam("error") String error) {
+        log.info("Accessing car management UI. Error: {}", error);
         List<Car> allCars = carService.getAllCars();
         return cars.data("cars", allCars, "error", error);
     }
@@ -36,15 +40,18 @@ public class CarTemplateResource {
     public Response addCar(@FormParam("brand") String brand,
                            @FormParam("model") String model,
                            @FormParam("color") String color) {
+        log.info("Attempting to add new car: brand={}, model={}, color={}", brand, model, color);
         try {
-            Car newCar = new Car(); // Standardkonstruktor
+            Car newCar = new Car();
             // ID wird hier nicht gesetzt, da sie typischerweise vom Backend generiert wird
             newCar.setBrand(brand);
             newCar.setModel(model);
             newCar.setColor(color);
             carService.addCar(newCar);
+            log.info("Successfully added car: {}", newCar);
             return Response.seeOther(URI.create("/cars-ui")).build();
         } catch (Exception e) {
+            log.error("Error adding car: {}", e.getMessage(), e);
             return Response.seeOther(UriBuilder.fromUri("/cars-ui").queryParam("error", e.getMessage()).build()).build();
         }
     }
@@ -56,26 +63,32 @@ public class CarTemplateResource {
                               @FormParam("brand") String brand,
                               @FormParam("model") String model,
                               @FormParam("color") String color) {
+        log.info("Attempting to update car with ID: {}. New data: brand={}, model={}, color={}", id, brand, model, color);
         try {
-            Car updatedCar = new Car(); // Standardkonstruktor
+            Car updatedCar = new Car();
             updatedCar.setId(id);
             updatedCar.setBrand(brand);
             updatedCar.setModel(model);
             updatedCar.setColor(color);
             carService.updateCar(id, updatedCar);
+            log.info("Successfully updated car with ID: {}", id);
             return Response.seeOther(URI.create("/cars-ui")).build();
         } catch (Exception e) {
+            log.error("Error updating car with ID {}: {}", id, e.getMessage(), e);
             return Response.seeOther(UriBuilder.fromUri("/cars-ui").queryParam("error", e.getMessage()).build()).build();
         }
     }
 
     @POST
     @Path("/delete/{id}")
-    public Response deleteCar(@PathParam("id") Long id) { // Typ Long, passend zum CarService
+    public Response deleteCar(@PathParam("id") Long id) {
+        log.info("Attempting to delete car with ID: {}", id);
         try {
             carService.deleteCar(id);
+            log.info("Successfully deleted car with ID: {}", id);
             return Response.seeOther(URI.create("/cars-ui")).build();
         } catch (Exception e) {
+            log.error("Error deleting car with ID {}: {}", id, e.getMessage(), e);
             return Response.seeOther(UriBuilder.fromUri("/cars-ui").queryParam("error", e.getMessage()).build()).build();
         }
     }

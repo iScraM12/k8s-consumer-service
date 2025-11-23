@@ -42,9 +42,41 @@ You can then access the UI at `http://localhost:8090/cars-ui`.
 
 ### Connecting to the External Car Service API (Provider)
 
-This consumer application connects to an external Car Service API. The base URL for this API is configured in `src/main/resources/application.yml`:
+This consumer application connects to an external Car Service API. The base URL for this API is configured in `src/main/resources/application.yml` (or `application-dev.yml`).
 
-Ensure that your Car Service API (provider) is running and accessible at the configured URL (e.g., `http://localhost:8080`).
+You can override the provider's URL at runtime. For example, to connect to a provider running on `http://my-provider:8080`:
+
+```shell
+mvn quarkus:dev -Dquarkus.rest-client.provider_yml.url=http://my-provider:8080
+```
+
+Ensure that your Car Service API (provider) is running and accessible at the configured URL.
+
+### Building and Running as a Docker Container
+
+First, build your Quarkus application and create a native executable:
+
+```shell
+mvn clean package -Dnative
+```
+
+Then, build the Docker image:
+
+```shell
+docker build -t k8s-consumer-service .
+```
+
+Finally, run your application container:
+
+```shell
+docker run -it --rm \
+  --network k8s-provider-service_default \
+  -p 8090:8080 \
+  -e QUARKUS_REST_CLIENT_PROVIDER_YML_URL=http://k8s-provider-service:8080 \
+  k8s-consumer-service # Adjust image name and tag if necessary
+```
+
+If your provider service is also in Docker, you might need to connect them via a Docker network.
 
 ## Running Tests
 
