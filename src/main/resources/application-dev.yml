@@ -1,0 +1,6 @@
+quarkus:
+  http:
+    port: 8090
+  rest-client:
+    provider_yml:
+      url: http://localhost:8080

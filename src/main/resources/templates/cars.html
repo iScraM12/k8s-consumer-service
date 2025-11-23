@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Car Management</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1, h2 { color: #333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        form { margin-top: 20px; padding: 15px; border: 1px solid #eee; background-color: #f9f9f9; }
+        form div { margin-bottom: 10px; }
+        label { display: inline-block; width: 80px; }
+        input[type="text"], input[type="number"] { width: 200px; padding: 5px; }
+        button { padding: 8px 15px; background-color: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Car Management</h1>
+
+    {#if error}
+        <p class="error">Fehler: {error}</p>
+    {/if}
+
+    <h2>Alle Autos</h2>
+    {#if cars.isEmpty()}
+        <p>Keine Autos gefunden.</p>
+    {#else}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Marke</th>
+                    <th>Modell</th>
+                    <th>Farbe</th>
+                    <th>Aktionen</th>
+                </tr>
+            </thead>
+            <tbody>
+                {#for car in cars}
+                    <tr>
+                        <td>{car.id}</td>
+                        <td>{car.brand}</td>
+                        <td>{car.model}</td>
+                        <td>{car.color}</td>
+                        <td>
+                            <form action="/cars-ui/delete/{car.id}" method="post" style="display:inline;">
+                                <button type="submit">Löschen</button>
+                            </form>
+                            <button onclick="editCar('{car.id}', '{car.brand}', '{car.model}', '{car.color}')">Bearbeiten</button>
+                        </td>
+                    </tr>
+                {/for}
+            </tbody>
+        </table>
+    {/if}
+
+    <h2>Auto hinzufügen</h2>
+    <form action="/cars-ui/add" method="post">
+        <div>
+            <label for="addBrand">Marke:</label>
+            <input type="text" id="addBrand" name="brand" required>
+        </div>
+        <div>
+            <label for="addModel">Modell:</label>
+            <input type="text" id="addModel" name="model" required>
+        </div>
+        <div>
+            <label for="addColor">Farbe:</label>
+            <input type="text" id="addColor" name="color" required>
+        </div>
+        <button type="submit">Hinzufügen</button>
+    </form>
+
+    <h2>Auto bearbeiten</h2>
+    <form action="/cars-ui/update" method="post" id="editForm">
+        <div>
+            <label for="editId">ID:</label>
+            <input type="number" id="editId" name="id" readonly required>
+        </div>
+        <div>
+            <label for="editBrand">Marke:</label>
+            <input type="text" id="editBrand" name="brand" required>
+        </div>
+        <div>
+            <label for="editModel">Modell:</label>
+            <input type="text" id="editModel" name="model" required>
+        </div>
+        <div>
+            <label for="editColor">Farbe:</label>
+            <input type="text" id="editColor" name="color" required>
+        </div>
+        <button type="submit">Aktualisieren</button>
+    </form>
+
+    <script>
+        function editCar(id, brand, model, color) {
+            document.getElementById('editId').value = id;
+            document.getElementById('editBrand').value = brand;
+            document.getElementById('editModel').value = model;
+            document.getElementById('editColor').value = color;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+---
+openapi: 3.0.0
+tags:
+  - name: Car Resource
+    description: Operations related to cars
+components:
+  schemas:
+    Car:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        brand:
+          type: string
+        model:
+          type: string
+        color:
+          type: string
+paths:
+  /cars:
+    get:
+      summary: Get all cars
+      description: Retrieves a list of all available cars.
+      operationId: getAllCars
+      tags:
+        - Car Resource
+      responses:
+        "200":
+          description: List of cars
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Car"
+    post:
+      summary: Create a new car
+      description: Creates a new car and returns the created car with its assigned
+        ID.
+      operationId: createCar
+      tags:
+        - Car Resource
+      requestBody:
+        description: Car object to be created
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Car"
+        required: true
+      responses:
+        "201":
+          description: Car created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Car"
+        "400":
+          description: Invalid car data provided
+  /cars/{id}:
+    put:
+      summary: Update an existing car
+      description: Updates an existing car identified by its ID.
+      operationId: updateCar
+      tags:
+        - Car Resource
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Updated car object
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Car"
+        required: true
+      responses:
+        "200":
+          description: Car updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Car"
+        "404":
+          description: Car not found
+        "400":
+          description: Invalid car data provided
+    get:
+      summary: Get car by ID
+      description: Retrieves a single car by its unique identifier.
+      operationId: getCarById
+      tags:
+        - Car Resource
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Car found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Car"
+        "404":
+          description: Car not found
+    delete:
+      summary: Delete a car by ID
+      description: Deletes a car by its unique identifier.
+      operationId: deleteCar
+      tags:
+        - Car Resource
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: Car deleted successfully
+        "404":
+          description: Car not found
+info:
+  title: k8s-consumer-service API
+  version: 1.0.0-SNAPSHOT

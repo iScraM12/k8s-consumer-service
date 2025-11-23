@@ -1,0 +1,6 @@
+quarkus:
+  openapi-generator:
+    codegen:
+      spec:
+        provider_yml:
+          base-package: com.iscram.k8s.consumer.provider.api
