@@ -1,7 +1,4 @@
 quarkus:
-  config:
-    convert:
-      empty-strings-as-null: false # Erlaubt leere Strings als Konfigurationswerte
   openapi-generator:
     codegen:
       spec:
