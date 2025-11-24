@@ -1,6 +1,14 @@
 quarkus:
+  config:
+    convert:
+      empty-strings-as-null: false # Erlaubt leere Strings als Konfigurationswerte
   openapi-generator:
     codegen:
       spec:
         provider_yml:
           base-package: com.iscram.k8s.consumer.provider.api
+
+ui:
+  cars:
+    base:
+      path: "/"

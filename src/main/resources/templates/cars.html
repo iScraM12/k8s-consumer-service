@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Car Management</title>
+    <title>Car Management by --> {hostname} <--</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         h1, h2 { color: #333; }
@@ -47,7 +47,7 @@
                         <td>{car.model}</td>
                         <td>{car.color}</td>
                         <td>
-                            <form action="/cars-ui/delete/{car.id}" method="post" style="display:inline;">
+                            <form action="{carsUiBasePath}cars-ui/delete/{car.id}" method="post" style="display:inline;">
                                 <button type="submit">Löschen</button>
                             </form>
                             <button onclick="editCar('{car.id}', '{car.brand}', '{car.model}', '{car.color}')">Bearbeiten</button>
@@ -59,7 +59,7 @@
     {/if}
 
     <h2>Auto hinzufügen</h2>
-    <form action="/cars-ui/add" method="post">
+    <form action="{carsUiBasePath}cars-ui/add" method="post">
         <div>
             <label for="addBrand">Marke:</label>
             <input type="text" id="addBrand" name="brand" required>
@@ -76,7 +76,7 @@
     </form>
 
     <h2>Auto bearbeiten</h2>
-    <form action="/cars-ui/update" method="post" id="editForm">
+    <form action="{carsUiBasePath}cars-ui/update" method="post" id="editForm">
         <div>
             <label for="editId">ID:</label>
             <input type="number" id="editId" name="id" readonly required>

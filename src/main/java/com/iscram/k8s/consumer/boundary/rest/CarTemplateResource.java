@@ -11,6 +11,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.microprofile.config.inject.ConfigProperty; // Import für @ConfigProperty
 
 import java.net.URI;
 import java.util.List;
@@ -22,16 +23,25 @@ import java.util.List;
 public class CarTemplateResource {
 
     @Inject
-    Template cars; // Das cars.html Template
+    Template cars;
 
     @Inject
     CarService carService;
+
+    @ConfigProperty(name = "ui.cars.base.path", defaultValue = "/") // Injiziert den Konfigurationswert
+    String carsUiBasePath;
+
+    @ConfigProperty(name = "hostname", defaultValue = "local")
+    String hostname;
+
+
 
     @GET
     public TemplateInstance getCarsPage(@QueryParam("error") String error) {
         log.info("Accessing car management UI. Error: {}", error);
         List<Car> allCars = carService.getAllCars();
-        return cars.data("cars", allCars, "error", error);
+        // Übergibt den Pfad als Variable an das Template
+        return cars.data("cars", allCars, "error", error, "carsUiPath", carsUiBasePath, "hostname", hostname);
     }
 
     @POST
@@ -43,16 +53,15 @@ public class CarTemplateResource {
         log.info("Attempting to add new car: brand={}, model={}, color={}", brand, model, color);
         try {
             Car newCar = new Car();
-            // ID wird hier nicht gesetzt, da sie typischerweise vom Backend generiert wird
             newCar.setBrand(brand);
             newCar.setModel(model);
             newCar.setColor(color);
             carService.addCar(newCar);
             log.info("Successfully added car: {}", newCar);
-            return Response.seeOther(URI.create("/cars-ui")).build();
+            return Response.seeOther(URI.create(carsUiBasePath)).build();
         } catch (Exception e) {
             log.error("Error adding car: {}", e.getMessage(), e);
-            return Response.seeOther(UriBuilder.fromUri("/cars-ui").queryParam("error", e.getMessage()).build()).build();
+            return Response.seeOther(UriBuilder.fromUri(carsUiBasePath).queryParam("error", e.getMessage()).build()).build();
         }
     }
 
@@ -72,10 +81,10 @@ public class CarTemplateResource {
             updatedCar.setColor(color);
             carService.updateCar(id, updatedCar);
             log.info("Successfully updated car with ID: {}", id);
-            return Response.seeOther(URI.create("/cars-ui")).build();
+            return Response.seeOther(URI.create(carsUiBasePath)).build();
         } catch (Exception e) {
             log.error("Error updating car with ID {}: {}", id, e.getMessage(), e);
-            return Response.seeOther(UriBuilder.fromUri("/cars-ui").queryParam("error", e.getMessage()).build()).build();
+            return Response.seeOther(UriBuilder.fromUri(carsUiBasePath).queryParam("error", e.getMessage()).build()).build();
         }
     }
 
@@ -86,10 +95,10 @@ public class CarTemplateResource {
         try {
             carService.deleteCar(id);
             log.info("Successfully deleted car with ID: {}", id);
-            return Response.seeOther(URI.create("/cars-ui")).build();
+            return Response.seeOther(URI.create(carsUiBasePath)).build();
         } catch (Exception e) {
             log.error("Error deleting car with ID {}: {}", id, e.getMessage(), e);
-            return Response.seeOther(UriBuilder.fromUri("/cars-ui").queryParam("error", e.getMessage()).build()).build();
+            return Response.seeOther(UriBuilder.fromUri(carsUiBasePath).queryParam("error", e.getMessage()).build()).build();
         }
     }
 }
